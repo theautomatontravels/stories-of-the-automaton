@@ -1,0 +1,34 @@
+{
+  "name": "stories-of-the-automaton",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theautomatontravels/stories-of-the-automaton.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/theautomatontravels/stories-of-the-automaton/issues"
+  },
+  "homepage": "https://github.com/theautomatontravels/stories-of-the-automaton#readme",
+  "dependencies": {
+    "@babel/preset-env": "^7.13.15",
+    "@types/parsimmon": "^1.10.6",
+    "parsimmon": "^1.16.0",
+    "ramda": "^0.27.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "smartypants": "^0.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.37",
+    "babel-jest": "^26.6.3",
+    "jest": "^26.6.3"
+  }
+}
