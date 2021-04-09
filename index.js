@@ -103,14 +103,14 @@ sections.forEach((s) => {
   );
 });
 
-Fs.writeFileSync(
-  Path.join("./docs", "index.html"),
-  html({
-    title: "index",
-    body: renderToStaticMarkup(
-      h(Index, {
-        sections,
-      })
-    ),
-  })
-);
+const indexFile = html({
+  title: "index",
+  body: renderToStaticMarkup(
+    h(Index, {
+      sections,
+    })
+  ),
+});
+
+Fs.writeFileSync(Path.join("./docs", "index.html"), indexFile);
+Fs.writeFileSync(Path.join("./docs", "404.html"), indexFile);
