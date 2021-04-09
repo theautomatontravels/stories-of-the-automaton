@@ -32,7 +32,7 @@ function smart(s) {
   return smartypantsu(s, "1");
 }
 
-function markup(s) {
+function markupItalicsAndSmart(s) {
   let r = [];
   const re = /\/([\w\d .!?;:,*'"\-()]+)\//g;
   let result;
@@ -45,6 +45,11 @@ function markup(s) {
   r.push(smart(s.slice(sofar)));
   if (!r.length) return s;
   return r.map((r, i) => h(Fragment, { key: i }, r));
+}
+
+function markup(s) {
+  if (/-{5,}/.test(s)) return h("hr");
+  return markupItalicsAndSmart(s);
 }
 
 function toLink(s) {
