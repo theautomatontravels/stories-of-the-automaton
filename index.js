@@ -89,12 +89,13 @@ const ast = parse("./stories/main.org");
 
 const sections = ast.sections.filter((s) => s.header.keyword !== "TODO");
 
+if (!Fs.existsSync("./docs")) {
+  Fs.mkdirSync("docs");
+}
+
 sections.forEach((s) => {
-  if (!Fs.existsSync("./dist")) {
-    Fs.mkdirSync("dist");
-  }
   Fs.writeFileSync(
-    Path.join("./dist", toLink(s.header.value) + ".html"),
+    Path.join("./docs", toLink(s.header.value) + ".html"),
     html({
       title: s.header.value,
       body: renderToStaticMarkup(h(Page, s)),
@@ -103,7 +104,7 @@ sections.forEach((s) => {
 });
 
 Fs.writeFileSync(
-  Path.join("./dist", "index.html"),
+  Path.join("./docs", "index.html"),
   html({
     title: "index",
     body: renderToStaticMarkup(
