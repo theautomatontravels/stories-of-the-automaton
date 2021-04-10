@@ -20,7 +20,7 @@ function html({ title, body }) {
     <meta name="description" content="the automaton stories">
     <meta name="author" content="the automaton">
     <link href="https://fonts.googleapis.com/css?family=Nunito:900,900italic,300,300italic&subset=latin-ext,latin" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./styles.css">
   </head>
 
   <body>
