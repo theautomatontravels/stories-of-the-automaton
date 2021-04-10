@@ -1,0 +1,55 @@
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.a-icon {
+    border-radius: 2px;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    transition:
+        background-color linear 250ms,
+        border linear 250ms;
+}
+
+.a-icon:hover {
+    background-color: lightgray;
+    border: 1px solid black;
+}
+
+.a-icon .youtube-triangle {
+    fill: white;
+    transition: fill linear 500ms;
+}
+
+.a-icon:hover .youtube-triangle {
+    fill: lightgray;
+}
+
+a {
+}
+
+h1, h2 {
+    font-family: "Montserrat","Helvetica Neue",Helvetica,sans-serif;
+    text-transform: lowercase;
+}
+
+article {
+    display: flex;
+    flex-direction: column;
+    max-width: 80rem;
+}
+
+a, p {
+    font-family: "Nunito","PT Serif",Georgia,"Times New Roman",serif;
+    font-size: 2rem;
+}
+
+h1 {
+    font-size: 3rem;
+}
+
+h2 {
+    font-size: 2.5rem;
+}

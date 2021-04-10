@@ -3,6 +3,9 @@
 #+LATEX_HEADER: \usepackage{lmodern}
 
 * Confraternity of Christrian Doctrine
+:PROPERTIES:
+:url: https://www.youtube.com/watch?v=dOw3WdPV83Y
+:END:
 
 When I was a child I went to something called /CCD/. Most of the children in the small Minnesota town went too. I never knew what CCD stood for, and I don't think any of the other children did either.
 
@@ -53,6 +56,9 @@ It was a shameful and silent walk from the administrator's office back to the ca
 She did give me a real response to my interrogative retort, however. She said that the church could refuse to perform my marriage ceremony later in life if I didn't complete CCD.
   
 * Hometown Pizza
+:PROPERTIES:
+:url:      https://www.youtube.com/watch?v=ZawlmCUsFj0
+:END:
 
 When I was a teenager I worked at a local pizza joint named Peter's Pies. To my small Minnesota town, that place's pizza was important. I only worked there for the summer before I went off to college, but while I was there I learned what exactly made Peter's Pies so important to the town.
 
@@ -107,6 +113,9 @@ The next day, Peter's Pies was not open for Thanksgiving. The Proprietor did not
 For my hometown, it was a tragedy. But it was inevitable that Peter's Pies would open their doors again. The Proprietor put the whole thing behind him, picked himself up by his bootstraps, and came back to show his usual smile to the regulars who didn't even realize anything was the matter. That's what makes Peter's Pies so important to the town.
 
 * Change the World
+:PROPERTIES:
+:url:      https://www.youtube.com/watch?v=aGal9vkUBhI
+:END:
 
 When I was a young adult, there was a day I was walking with the automaton. I doubt anybody else knew the automaton by that name. Their name might have been "orphan kid back in highschool," or another title similarly absent of an actual name. For whatever reason, however, I was chosen to know the nature of the automaton's being, what was the automaton at least according to an actual name.
 
@@ -179,6 +188,9 @@ Of course I knew that the world wouldn't really see a lot of the automaton, at l
 Since the automaton could live forever, it had to be true.
 
 * The President of the Greatest Country in the World
+:PROPERTIES:
+:url:      https://www.youtube.com/watch?v=gWE8KOWv1bs
+:END:
 
 The automaton had an opportunity to meet the president of the Greatest Country in the World, the United States of America. It was by complete accident that the man became the president, but it was an accident that the automaton ensured would happen.
 
@@ -239,7 +251,10 @@ In the speech the new president gave at the meeting, he had a decisive summary o
 The audience exploded in uproarious applause. The speech continued, but the automaton stopped listening. The new president droned on and on and on.
 
 * The Wiggles: An Advanced Governmental Task Force
-  
+:PROPERTIES:
+:url:      https://www.youtube.com/watch?v=tYgSDWYjhYg
+:END:
+
 The Wiggles were an advanced governmental task force. They were very good at what they did.
 
 Since a large part of the country's economy relied on people having families, the government saw a role in inticing people to start them. If there weren't governmental task forces like the Wiggles to put smiles on the faces of children, then nobody would be inspired by those smiling faces to start families of their own. And, without families, a large part of the country's economy would die.
