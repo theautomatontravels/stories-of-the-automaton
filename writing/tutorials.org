@@ -1,0 +1,112 @@
+#+OPTIONS: toc:nil num:nil
+#+LATEX_HEADER: \usepackage[a4paper, margin=1in]{geometry}
+#+LATEX_HEADER: \usepackage{lmodern}
+
+For recording, Emacs should be at 129 x 34 (probably :o)
+
+* Creating a Static Website from an Org File
+ 
+Oh my. It seems we are at that point in our lives where we're wanting to create a simple web site containing the scripts of all the fun and cool videos we've been making the past few weeks. That's especially true for me!
+
+If you didn't know already, I'm the compiler of the Stories of the Automaton. If you don't know what that is, that's okay. This tutorial is unrelated to those stories. However, I would sure appreciate it if you gave those videos a watch after watching this one.
+
+** Outline
+
+First thing's first, let's try to outline exactly what we're going to be doing in this tutorial. The scripts for the Stories of the Automaton are written in a markup format called =org=. If you're not familiar with =org=, it's kind of like =markdown=. It's a plain text file format that works well with the text editor I use. =org= files are useful for the Stories of the Automaton videos because I can convert them to =pdf= files that I can print. That way I can slip the printed scripts under my girlfriend's office door and expect her to get back to me with feedback on her own time.
+
+What we're going to go through in this instructional video is how to convert those =org= files (actually just one =org= file) to =html= documents. That way we can make a globally available website out of the scripts to show to the whole world instead of just the floor of my girlfriend's office.
+
+However, in order to convert an =org= file, we're first going to have to be able to read an =org= file. To do that we'll be writing a parser. There's a couple =org= parsers already written that we could use, but it wouldn't be as fun or cool if we didn't write our own.
+
+We'll be using =parsimmon= to create a parser. =parsimmon= is a monadic LL(infinity) parser combinator library for JavaScript. Don't worry about that description, though. It's practically meaningless!
+
+We're going to use =parsimmon= to create a handful of little parsers that will be combined together in the end to create one regular parser. To keep it easy on ourselves, the parser won't handle the whole spectrum of =org= syntax. We're only going to worry about what we /need/ to worry about.
+
+Once we can read an =org= file, we can then try to convert it to =html=. We'll use =react= to do that, since =react= is easily the most popular JavaScript library on the Internet. Not only will more people be able to better understand this video, there will be more people interested in this video to possibly be converted into views for the Stories of the Automaton.
+
+** TODO Parsimmon
+
+First, let's create a new language with =parsimmon=.
+
+#+BEGIN_SRC javascript
+  const OrgLang = P.createLanguage({})
+#+END_SRC 
+
+This language is going to hold the individual parts of the =org= syntax we're concerning ourself with. The specific parts will be:
+- keywords
+- headers
+- properties
+- paragraphs
+
+Keywords aren't very important to what we're doing, but we have to deal with it because it's related to the =pdf= generation I talked about earlier.
+
+The header syntax will eventually relate to our =html= =h2= tags. The paragraph syntax will similarly be for the =html= =p= tags.
+
+The properties syntax will hold the url associated with the original YouTube video. The properties syntax is the most important, because the whole point of this endeavor is to generate more views on the Stories of the Automaton videos.
+
+In the end, our new =parsimmon= language will also handle putting each of these little parsers together. It will then be able to give us a JavaScript object representative of the parsed =org= file.
+
+*** Parsing Org Keywords
+
+An =org= file keyword looks like this:
+
+#+BEGIN_SRC org
+  #+OPTIONS: toc:nil
+  #+LATEX_HEADER: \usepackage[a4paper, margin=1in]{geometry}
+  #+LATEX_HEADER: \usepackage{lmodern}
+#+END_SRC
+
+An =org= keyword is a sequence of ~#+~, then a series of letters and underscores, then a single ~:~, followed by anything up until a line terminator. The associated little parser might look like this. It's a sequence of four littler parsers, whose parsed values are mapped to an object. Whatever the second littler parser parses becomes the name, whatever the fourth littler parser parses becomes the value.
+
+The specific examples of =org= keywords here will make it so that a =pdf= will not include a table of contents, it will have the correct dimensions for a sheet of a4 premium printer paper, and it will use a font which looks a little bit better than the default font.
+
+#+BEGIN_SRC javascript
+  const OrgLang = P.createLanguage({
+    KeyWord: () =>
+      P.seqMap(
+        P.string("#+"),
+        P.regexp(/\w+/),
+        P.string(":"),
+        P.regexp(/.*/),
+        (_1, name, _3, value) => ({
+          type: "keyword",
+          name: name.trim(),
+          value: value.trim(),
+        })
+      ),
+  })
+#+END_SRC 
+
+*** Parsing Org Hedaers
+
+=org= file headers look like this:
+
+#+BEGIN_SRC org
+  * I am a header
+  ** I am also a header, but I have a different level than the one before me
+#+END_SRC
+
+An =org= header is a sequence of asterisks, then at least one space, followed by anything until a line terminator. We can add its definition to our ~parsimmon~ language so far. We use the same technique as before, leveraging ~parsimmon~'s very fun and cool ~seqmap~ function to map the parsed values of the given little parsers to a JavaScript object with useful structure.
+
+#+BEGIN_SRC javascript
+  const OrgLang = P.createLanguage({
+    // ...
+    Header: () =>
+      P.seqMap(
+        P.regexp(/\*+/),
+        P.regexp(/ +/),
+        P.regexp(/.*/),
+        (stars, _2, header) => ({
+          type: 'header',
+          level: stars.length,
+          value: header.trim()
+        })
+      ),
+  })
+#+END_SRC 
+
+*** TODO Parsing Org Properties
+
+*** TODO Parsing Org Paragraphs
+
+** TODO React

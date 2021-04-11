@@ -117,11 +117,6 @@ function Index({ sections }) {
 
 function Page({ header, content, properties }) {
   assert(properties.value.url, "no url property", properties);
-  const articleBody = content.map((c, i) =>
-    /-{5,}/.test(c.value)
-      ? h("hr", { key: i })
-      : h("p", { key: i }, markup(c.value))
-  );
   return [
     h("nav", {}, [
       h(
@@ -155,12 +150,16 @@ function Page({ header, content, properties }) {
           youtube
         )
       ),
-      ...articleBody,
+      ...content.map((c, i) =>
+        /-{5,}/.test(c.value)
+          ? h("hr", { key: i })
+          : h("p", { key: i }, markup(c.value))
+      ),
     ]),
   ];
 }
 
-const ast = parse("./stories/main.org");
+const ast = parse("./writing/stories-of-the-automaton.org");
 
 const sections = ast.sections.filter((s) => s.header.keyword !== "TODO");
 
