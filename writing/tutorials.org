@@ -24,7 +24,7 @@ We're going to use =parsimmon= to create a handful of little parsers that will b
 
 Once we can read an =org= file, we can then try to convert it to =html=. We'll use =react= to do that, since =react= is easily the most popular JavaScript library on the Internet. Not only will more people be able to better understand this video, there will be more people interested in this video to possibly be converted into views for the Stories of the Automaton.
 
-** TODO Parsimmon
+** Parsimmon
 
 First, let's create a new language with =parsimmon=.
 
@@ -86,7 +86,7 @@ The specific examples of =org= keywords here will make it so that a =pdf= will n
   ** I am also a header, but I have a different level than the one before me
 #+END_SRC
 
-An =org= header is a sequence of asterisks, then at least one space, followed by anything until a line terminator. We can add its definition to our ~parsimmon~ language so far. We use the same technique as before, leveraging ~parsimmon~'s very fun and cool ~seqmap~ function to map the parsed values of the given little parsers to a JavaScript object with useful structure.
+An =org= header is a sequence of asterisks, then at least one space, followed by anything until a line terminator. We can add its definition to our ~parsimmon~ language so far. We use the same technique as before, leveraging ~parsimmon~'s very fun and cool ~seqMap~ function to map the parsed values of the given little parsers to a JavaScript object with useful structure.
 
 #+BEGIN_SRC javascript
   const OrgLang = P.createLanguage({
@@ -105,8 +105,122 @@ An =org= header is a sequence of asterisks, then at least one space, followed by
   })
 #+END_SRC 
 
-*** TODO Parsing Org Properties
+*** Parsing Org Properties
 
-*** TODO Parsing Org Paragraphs
+=org= file properties look like this:
+
+#+BEGIN_SRC org
+  :PROPERTIES:
+  :url: https://theautomatontravels.github.io/stories-of-the-automaton/
+  :END:
+#+END_SRC
+
+The properties syntax in =org= is referred to as a properties drawer, since your text editor is meant to be able to open and close it like a drawer. We again employ the same technique using ~seqMap~ to define the little parser. We start and end with the =properties= and =end= syntax. What goes in between is parsed by another little parser we name =PropertyPair=. There may be many property pairs separated by new lines and maybe some trailing whitespace characters.
+
+#+BEGIN_SRC javascript
+  const OrgLang = P.createLanguage({
+    // ...
+    Properties: (r) =>
+      P.seqMap(
+        P.regexp(/[ ]*:PROPERTIES:[ ]*\n/),
+        r.PropertyPair.sepBy(P.regex(/\n\s*/)),
+        P.regexp(/\n[ ]*:END:[ ]*/),
+          (_1, pairs, _2) => ({
+            type: "properties",
+            value: pairs.reduce(
+                (r, { key, value }) => ({ ...r, [key]: value }),
+                {}
+              ),
+        })
+    ),
+  })
+#+END_SRC
+
+The keys in our properties drawer key-value pairs are letters wrapped by colons, and we allow there to be some preceding whitespace. The values are whatever comes after the key syntax except line terminators.
+
+#+BEGIN_SRC javascript
+  const OrgLang = createLanguage({
+    // ...
+    PropertyPair: (r) =>
+      P.seqMap(
+          P.regexp(/ *:(\w+):/i, 1),
+          P.regexp(/.+/),
+          (key, value) => ({
+            type: "property-pair",
+            key,
+            value: value.trim(),
+          })
+      ),
+    // ...
+  })
+#+END_SRC
+
+*** Parsing Org Paragraphs
+
+Finally, we add =org= paragraphs to our =parsimmon= language. The majority of what our language needs to parse is paragraphs. Paragraphs are the most straightforward. It's just a somewhat complicated character set that we map to our JavaScript object. The character set handles all the usual syntax of English writing. Words, digits, spaces, punctuation, quotations, hyphens and parentheses, as well as some markup language syntax characters like asterisks and slashes used for emphasis.
+
+#+BEGIN_SRC javascript
+  const OrgLang = P.createLanguage({
+    // ...
+    Text: () => P.regexp(/[\w\d .!?;:,'"\-()*/]+/),
+    Paragraph: (r) =>
+      r.Text.map((value) => ({
+        type: "paragraph",
+        value: value.trim(),     
+      })),
+    // ...
+  })
+#+END_SRC
+
+*** Putting Them All Together
+
+We then put all the little parsers together into one regular parser for the whole collection of relevant =org= syntaxes we'll be using, key words, headers, properties, and paragraphs. In an =org= file, the parts of the language are separated by newline characters and maybe some trailing whitespace characters. This resulting parser will give us a JavaScript array object representative of the original =org= file.
+    
+#+BEGIN_SRC javascript
+  const OrgLang = P.createLanguage({
+    // ...
+    File: (r) =>
+      P.alt(r.KeyWord, r.Header, r.Properties, r.Paragraph)
+          .sepBy(
+              P.regexp(/((\n+)(\s*))+/)
+          )
+  })
+#+END_SRC
+
+We'll have to clean this up a little, since we'll want to break up the different collections of paragraphs and their preceding headers into different sections that will represent the individual =html= pages we're going to make. We'll use some handy array transformation functions provided by the =ramda= library. We should be able to do most of the work in just one function, we'll call it =toSections=.
+
+First, we're going to drop anything that isn't a header from our input. This will be those keywords that we had to define in our =parsimmon= language. We don't need them for our current use case.
+
+The way we're using the =dropWhile= function makes it so that the first element in our array is guaranteed to be a header. So let's assign a variable for it and move on. We'll then split the rest of the array at the position of the next header. We're making the assumption that our =org= file doesn't have any nested headers. The Stories of the Automaton doesn't make use of nested headers in any way yet, so this should be okay. We'll call the everything before the next header =sectionContent=, and the rest will be =remaining=.
+
+At the moment we're always putting our properties right after the header. Anything remaining is just going to be a paragraph. So let's assign some variables for the properties and the paragraphs and move on.
+
+All the remaining content looks identical, so we can use the same function recursively to handle for it. Since we're making the function recursive, we need to handle for when there's no more work to do. At some point, there aren't going to be any more headers left to section off. This will be when the array is empty. So when our input array is empty let's just return an empty array. It will spread into the nothing for the previous call of the recursive function and allow it to return.
+
+#+BEGIN_SRC javascript
+  import { dropWhile, splitWhen } from 'ramda'
+  function toSections(orgArrayObject) {
+    orgArrayObject = dropWhile(
+      node => node.type !== 'header',
+      orgArrayObject
+    )
+    if (!orgArrayObject.length) return []
+    const header = orgArrayObject[0]
+    const [sectionContent, remaining] = splitWhen(
+      node => node.type !== 'header',
+      orgArrayObject.slice(1)
+    )
+    const properties = sectionContent[0]
+    const paragraphs = sectionContent.slice(1)
+    return [
+      {
+        header,
+        properties,
+        paragraphs
+      }, 
+      ...toSections(remaining)
+    ]
+  }
+#+END_SRC
 
 ** TODO React

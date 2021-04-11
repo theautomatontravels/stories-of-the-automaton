@@ -1,6 +1,7 @@
 * Header
 :PROPERTIES:
 :url: https://www.test.com
+:another: https://www.test.com
 :END:
 
 Paragraph.
