@@ -12,27 +12,28 @@ If you didn't know already, I'm the compiler of the Stories of the Automaton. If
 
 ** Outline
 
-First thing's first, let's try to outline exactly what we're going to be doing in this tutorial. The scripts for the Stories of the Automaton are written in a markup format called =org=. If you're not familiar with =org=, it's kind of like =markdown=. It's a plain text file format that works well with the text editor I use. =org= files are useful for the Stories of the Automaton videos because I can convert them to =pdf= files that I can print. That way I can slip the printed scripts under my girlfriend's office door and expect her to get back to me with feedback on her own time.
+First thing's first, let's try to outline exactly what we're going to be doing in this tutorial. The scripts for the Stories of the Automaton are written in a markup format called =org=. If you're not familiar with =org=, it's kind of like =markdown=. It's a plain text file format that works well with the text editor I use. =org= files are useful for the Stories of the Automaton videos because I can convert them to =pdf= files that I can print. As printed scripts, they can be slipped under my girlfriend's office door so she can get back to me with feedback on her own time.
 
-What we're going to go through in this instructional video is how to convert those =org= files (actually just one =org= file) to =html= documents. That way we can make a globally available website out of the scripts to show to the whole world instead of just the floor of my girlfriend's office.
+What we're going to go through in this instructional video is how to convert those =org= files (actually just one =org= file) to =html= documents. That way we can make a website out of the scripts to show to the whole world instead of just the floor of my girlfriend's office.
 
 However, in order to convert an =org= file, we're first going to have to be able to read an =org= file. To do that we'll be writing a parser. There's a couple =org= parsers already written that we could use, but it wouldn't be as fun or cool if we didn't write our own.
 
 We'll be using =parsimmon= to create a parser. =parsimmon= is a monadic LL(infinity) parser combinator library for JavaScript. Don't worry about that description, though. It's practically meaningless!
 
-We're going to use =parsimmon= to create a handful of little parsers that will be combined together in the end to create one regular parser. To keep it easy on ourselves, the parser won't handle the whole spectrum of =org= syntax. We're only going to worry about what we /need/ to worry about.
+We're going to use =parsimmon= to create a handful of little parsers that will be combined together in the end to create one regular parser. To keep it easy on ourselves, the parser won't handle the whole spectrum of =org= syntax. We're only going to worry about what we /need/ to worry about for this project.
 
-Once we can read an =org= file, we can then try to convert it to =html=. We'll use =react= to do that, since =react= is easily the most popular JavaScript library on the Internet. Not only will more people be able to better understand this video, there will be more people interested in this video to possibly be converted into views for the Stories of the Automaton.
+Once we can read an =org= file, we'll then convert it to =html=. We'll use =react= to do that, since =react= is easily the most popular JavaScript library on the Internet. Not only will more people be able to better understand this video (because more people are interested in =react=), a =react= video is more likely to gather more views and so more possible conversions for the Stories of the Automaton. But don't feel too pressured to watch them! Just know that they're there for you to watch. I think they're both mundane and interesting.
 
 ** Parsimmon
 
 First, let's create a new language with =parsimmon=.
 
 #+BEGIN_SRC javascript
+  import P from 'parsimmon'
   const OrgLang = P.createLanguage({})
 #+END_SRC 
 
-This language is going to hold the individual parts of the =org= syntax we're concerning ourself with. The specific parts will be:
+This language is going to hold the individual parts of the =org= syntax we're concerning ourselves with. The specific parts will be:
 - keywords
 - headers
 - properties
@@ -42,7 +43,9 @@ Keywords aren't very important to what we're doing, but we have to deal with it 
 
 The header syntax will eventually relate to our =html= =h2= tags. The paragraph syntax will similarly be for the =html= =p= tags.
 
-The properties syntax will hold the url associated with the original YouTube video. The properties syntax is the most important, because the whole point of this endeavor is to generate more views on the Stories of the Automaton videos.
+The properties syntax will hold the url associated with the original YouTube video. The properties syntax is the most important part, because the whole point of this endeavor is to generate more views on the Stories of the Automaton videos. But since we're creating a website with the same content as the videos, we could maybe say that that's just as important.
+
+Our =parsimmon= language will have at least one key-value pair for each of these parts.
 
 In the end, our new =parsimmon= language will also handle putting each of these little parsers together. It will then be able to give us a JavaScript object representative of the parsed =org= file.
 
@@ -77,7 +80,7 @@ The specific examples of =org= keywords here will make it so that a =pdf= will n
   })
 #+END_SRC 
 
-*** Parsing Org Hedaers
+*** Parsing Org Headers
 
 =org= file headers look like this:
 
@@ -223,4 +226,126 @@ All the remaining content looks identical, so we can use the same function recur
   }
 #+END_SRC
 
-** TODO React
+** React
+
+So far we've figured out how to convert the scripts of the Stories of the Automaton from an =org= file into a very handy JavaScript object array. Now it should be possible for us to iterate over that array, converting each of the elements into an =html= document.
+
+*** Creating a Document
+
+Let's start by writing our last function first. It will take the inner HTML of the body as an argument, and it will return a valid HTML document.
+
+#+BEGIN_SRC javascript
+  function html(bodyHTML) {
+    return `
+      <!doctype html>
+      <html lang="en">
+        <head>
+          <!-- ... -->
+        </head>
+
+        <body>${bodyHTML}</body>
+      </html>
+    `.trim();
+  }
+#+END_SRC
+
+We still need to generate that body =html= though, and generating =html= is pretty hard to do. This is where =react= is handy. =react= does a pretty good job of generating =html=, and it can run in a =node= environment so we don't even need a web browser.
+
+*** Generating HTML
+
+In my original code for this I wrote some additional functions, but we don't really need them. First we read our orgfile, trimming it for good measure. Then we use our parser to try to parse the orgfile that we read into memory. If it doesn't succeed then it will throw an error and our script will stop functioning. This is the behavior that we want. We then pass the resulting org array object our =toSections= function. Each of these sections make for pretty good-looking props to pass to a =react= component, remember that each section is an object with the keys =header=, =properties= and =paragraphs=, and the values are the javascript objects that we mapped to from our little parsers.
+
+Assuming we can make a valid =react= element to represent our page, =react= should be able to render it as the markup for our page. It gives us the =renderToStaticMarkup= function just for that purpose. When we have our body markup, we create a complete =html= document, then write it to a file.
+
+#+BEGIN_SRC javascript
+  import { renderToStaticMarkup } from 'react-dom/server'
+  import Fs from 'fs'
+  const orgfile = Fs.readFileSync(
+    './stories-of-the-automaton.org',
+    'utf-8'
+  ).trim()
+  const orgArrayObject = OrgLang.tryParse(orgfile)
+  toSections(orgArrayObject).forEach(section => {
+    const bodyHTML = renderToStaticMarkup(h(OurWebPage, section))
+    Fs.writeFileSync(
+      `./dist/${section.header.value.replace(/ /g, '-')}.html`,
+      html(bodyHTML)
+    )
+  })
+#+END_SRC
+
+*** Creating an "App"
+
+We don't yet have that =OurWebPage= =react= component though. So let's write that. The only requirement for a =react= component is that it returns a valid =react= element. An array of =react= elements is also a valid =react= element.
+
+To create a =react= element we can use =react='s =createElement= function. =createElement= is 13 characters long though, so I'm just going to call it =h=. =h= makes sense to me here as a variable name for a number of personal reasons. It might be helpful to imagine that it's short for "html."
+
+Our page will have a header with navigation at the top to bring us back to an index page. We've yet to make that index page, but it will contain links to all the different Stories of the Automaton. The header will also include the words "the automaton" since that seems relevant.
+
+The rest of the page will be the story of the automaton, which is just a heading and the collection of paragraphs that we parsed earlier. I'm using =p= as a shorthand for "paragraph." We'll also include the link to the video.
+
+#+BEGIN_SRC javascript
+  import { createElement as h } from 'react'
+  function OurWebPage({ header, properties, paragraphs }) {
+    return [
+      h('header', {} , [
+        h(
+          'a',
+          { href: 'index.html' },
+          'home'
+        ),
+        h('h1', {}, 'the automaton')
+      ]),
+      h('article', {}, [
+        h('h2', {}, header.value),
+        h(
+          'a',
+          { href: properties.value.url },
+          'watch the video'
+        ),
+        ...paragraphs.map(p => h('p', {}, p.value))
+      ])
+    ]
+  }
+#+END_SRC
+
+We can similarly create our index page
+
+#+BEGIN_SRC javascript
+  function Index({ sections }) {
+    return [
+      h('h1', {}, 'the automaton'),
+      h(
+        'ul',
+        {},
+        sections.map(
+          s => h(
+            'li',
+            {},
+            h(
+              'a',
+              {
+                href: `${s.header.value.replace(/ /g, '-')}.html`
+              },
+              s.header.value
+            )
+          )
+        )
+      )
+    ]
+  }
+  Fs.writeFileSync(
+    './dist/index.html', 
+    html(
+      renderToStaticMarkup(
+        h(Index, { sections: toSections(orgArrayObject) })
+      )
+    )
+  )
+#+END_SRC
+
+** TODO Wrapping up
+
+** TODO Misc
+*** TODO Test-driven Development
+*** TODO Performance Concerns

@@ -66,15 +66,12 @@ const youtube = h(
       d:
         "M154.3 17.5a19.6 19.6 0 0 0-13.8-13.8C128.4.4 79.7.4 79.7.4S31 .5 18.9 3.8A19.6 19.6 0 0 0 5.1 17.6C1.44 39.1.02 71.86 5.2 92.5A19.6 19.6 0 0 0 19 106.3c12.1 3.3 60.8 3.3 60.8 3.3s48.7 0 60.8-3.3a19.6 19.6 0 0 0 13.8-13.8c3.86-21.53 5.05-54.27-.1-75z",
     }),
-    [
-      h("title", { key: -1 }, "Link to the video on YouTube"),
-      h("path", {
-        className: "youtube-triangle",
-        key: -1,
-        // fill: "white",
-        d: "M64.2 78.4L104.6 55 64.2 31.6z",
-      }),
-    ],
+    h("path", {
+      className: "youtube-triangle",
+      key: -1,
+      // fill: "white",
+      d: "M64.2 78.4L104.6 55 64.2 31.6z",
+    }),
   ]
 );
 
@@ -118,11 +115,11 @@ function Index({ sections }) {
 function Page({ header, content, properties }) {
   assert(properties.value.url, "no url property", properties);
   return [
-    h("nav", {}, [
+    h("header", {}, [
       h(
         "a",
         {
-          title: "Go to the index page",
+          'aria-label': 'Index page',
           className: "a-icon",
           key: -3,
           href: "index.html",
@@ -140,7 +137,7 @@ function Page({ header, content, properties }) {
         h(
           "a",
           {
-            title: `Watch the video "${header.value}" on YouTube`,
+            'aria-label': `"${header.value}" YouTube video`,
             className: "a-icon",
             href: properties.value.url,
             style: {
